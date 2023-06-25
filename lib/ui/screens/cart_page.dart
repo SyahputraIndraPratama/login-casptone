@@ -24,13 +24,13 @@ class _CartPageState extends State<CartPage> {
           children: [
             SizedBox(
               height: 100,
-              child: Image.asset('assets/images/add-cart.png'),
+              child: Image.asset('assets/images/history.png'),
             ),
             const SizedBox(
               height: 10,
             ),
             Text(
-              'Your Cart is Empty',
+              'Your History',
               style: TextStyle(
                 color: Constants.primaryColor,
                 fontWeight: FontWeight.w300,

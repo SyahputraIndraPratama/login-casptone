@@ -16,6 +16,9 @@ class LoginScreen extends StatefulWidget {
 
 class  _LoginScreenState extends State <LoginScreen> {
 
+  late String email;
+  late String password;
+
   // form key
   final _formKey = GlobalKey<FormState>();
 
@@ -23,21 +26,35 @@ class  _LoginScreenState extends State <LoginScreen> {
   final TextEditingController emailController = new TextEditingController();
   final TextEditingController passwordController = new TextEditingController();
 
-  void _login(String email, String password) async {
-    final url = 'https://127.0.0.1:5000/login';
+  Future<void> _login() async {
+    final String email = emailController.text;
+    final String password = passwordController.text;
+
     final response = await http.post(
-      Uri.parse(url),
-      body: {'email': email, 'password': password},
+      Uri.parse('http://192.168.0.109:5000/api/user/login'),
+      body: jsonEncode({'email': email, 'password': password}),
+      headers: {'Content-Type': 'application/json'},
     );
 
     if (response.statusCode == 200) {
-      print("login success");
-      final responseData = json.decode(response.body);
-      final token = responseData['token'];
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => RootPage()));
-    } else if(response.statusCode == 400) {
-      print("login gagal: ${response.body}");
+      // ignore: unused_local_variable
+      final Map<String, dynamic> responseData = json.decode(response.body);
+      // ignore: use_build_context_synchronously
+      await Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => RootPage())); 
+    } else {
+      final Map<String, dynamic> errorData = json.decode(response.body);
+      // ignore: unused_local_variable
+      final String errorMessage = errorData['message'];
+      // TODO: Display login error message
     }
+  }
+
+  bool passVisible = false;
+  @override
+  void initState() {
+    super.initState();
+    passVisible = true;
   }
 
 
@@ -48,7 +65,16 @@ class  _LoginScreenState extends State <LoginScreen> {
       autofocus: false,
       controller: emailController,
       keyboardType: TextInputType.emailAddress,
-      //validator: () {},
+      onChanged: (value) {
+        setState(() {
+          email = value;
+        });
+      },
+      validator: ((value) {
+        if (value == '') {
+          return "Mohon isi terlebih dahulu!";
+        }
+      }),
       onSaved: (value)
       {
         emailController.text = value!;
@@ -65,14 +91,21 @@ class  _LoginScreenState extends State <LoginScreen> {
     );
 
 
-
-
     //password field
     final passwordField = TextFormField(
       autofocus: false,
       controller: passwordController,
       obscureText: true,
-      //validator: () {},
+      onChanged: (value) {
+        setState(() {
+          password = value;
+        });
+      },
+      validator: ((value) {
+        if (value == '') {
+          return "Mohon isi terlebih dahulu!";
+        }
+      }),
       onSaved: (value)
       {
         passwordController.text = value!;
@@ -95,7 +128,7 @@ class  _LoginScreenState extends State <LoginScreen> {
           padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
           minWidth: MediaQuery.of(context).size.width,
           onPressed: () {
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => RootPage()));
+           _login();
           },
           child: Text(
             "Login", 
@@ -104,7 +137,6 @@ class  _LoginScreenState extends State <LoginScreen> {
                 fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
           )),
     );
-
 
     return Scaffold(
       backgroundColor: Colors.white,

@@ -5,6 +5,7 @@ import 'package:zoo/model/user_model.dart';
 import 'package:zoo/screens/home_screens.dart';
 import 'package:flutter/material.dart';
 import 'package:zoo/screens/login_screens.dart';
+import 'package:zoo/screens/regis_controller.dart';
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({Key? key}) : super(key: key);
@@ -15,6 +16,11 @@ class RegistrationScreen extends StatefulWidget {
 
 class _RegistrationScreenState extends State<RegistrationScreen> {
 
+  late String firstName;
+  late String lastName;
+  late String email;
+  late String password;
+  late String retypepassword;
 
   // our form key
   final _formKey = GlobalKey<FormState>();
@@ -23,30 +29,9 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
   final lastNameEditingController = new TextEditingController();
   final emailEditingController = new TextEditingController();
   final passwordEditingController = new TextEditingController();
-  final confirmPasswordEditingController = new TextEditingController();
+  final retypePasswordEditingController = new TextEditingController();
 
-  void _register(String firstName, String lastName, String email, String password, String confirmPassword) async {
-    final url = 'https://127.0.0.1:5000/signup';
-    final response = await http.post(
-      Uri.parse(url), 
-      body: {
-        'first_name': firstName,
-        'last_name' : lastName,
-        'email': email, 
-        'password': password,
-        'confirm_password': confirmPassword,
-        }
-      );
-
-      if (response.statusCode == 200) {
-      print("registrasi success");
-      final responseData = jsonDecode(response.body);
-      final token = responseData['token'];
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen()));
-    } else if(response.statusCode == 400) {
-      print("registrasi gagal: ${response.body}");
-    }
-  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +40,16 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       autofocus: false,
       controller: firstNameEditingController,
       keyboardType: TextInputType.name,
-      //validator: () {},
+      onChanged: (value) {
+        setState(() {
+          firstName = value;
+        });
+      },
+      validator: ((value) {
+        if (value == '') {
+          return "Mohon isi terlebih dahulu!";
+        }
+      }),
       onSaved: (value)
       {
         firstNameEditingController.text = value!;
@@ -75,7 +69,16 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       autofocus: false,
       controller: lastNameEditingController,
       keyboardType: TextInputType.name,
-      //validator: () {},
+      onChanged: (value) {
+        setState(() {
+          lastName = value;
+        });
+      },
+      validator: ((value) {
+        if (value == '') {
+          return "Mohon isi terlebih dahulu!";
+        }
+      }),
       onSaved: (value)
       {
         lastNameEditingController.text = value!;
@@ -95,7 +98,16 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       autofocus: false,
       controller: emailEditingController,
       keyboardType: TextInputType.emailAddress,
-      //validator: () {},
+      onChanged: (value) {
+        setState(() {
+          email = value;
+        });
+      },
+      validator: ((value) {
+        if (value == '') {
+          return "Mohon isi terlebih dahulu!";
+        }
+      }),
       onSaved: (value)
       {
         emailEditingController.text = value!;
@@ -115,7 +127,16 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       autofocus: false,
       controller: passwordEditingController,
       obscureText: true,
-      //validator: () {},
+      onChanged: (value) {
+        setState(() {
+          password = value;
+        });
+      },
+      validator: ((value) {
+        if (value == '') {
+          return "Mohon isi terlebih dahulu!";
+        }
+      }),
       onSaved: (value)
       {
         passwordEditingController.text = value!;
@@ -130,21 +151,30 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
         ),
       ));
 
-      //confirm password field
-      final confirmPasswordField = TextFormField(
+      //retype password field
+      final retypePasswordField = TextFormField(
       autofocus: false,
-      controller: confirmPasswordEditingController,
+      controller: retypePasswordEditingController,
       obscureText: true,
-      //validator: () {},
+      onChanged: (value) {
+        setState(() {
+          retypepassword = value;
+        });
+      },
+      validator: ((value) {
+        if (value == '') {
+          return "Mohon isi terlebih dahulu!";
+        }
+      }),
       onSaved: (value)
       {
-        confirmPasswordEditingController.text = value!;
+        retypePasswordEditingController.text = value!;
       },
       textInputAction: TextInputAction.done,
       decoration: InputDecoration(
         prefixIcon: Icon(Icons.vpn_key),
         contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-        hintText: "Confirm Password",
+        hintText: "Retype Password",
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
         ),
@@ -158,8 +188,19 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       child: MaterialButton(
           padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
           minWidth: MediaQuery.of(context).size.width,
-          onPressed: (){
-            Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginScreen()));
+          onPressed: () async {
+            if (_formKey.currentState!.validate()) {
+                          print("Validation Success");
+                          print("email : " + email);
+                          print("password : " + password);
+                          print("first_name : " + firstName);
+                          print("last_name : " + lastName);
+                          print("retype_password : " + retypepassword);
+                await HttpService.flutter_register(
+                firstName, lastName, email, password, retypepassword, context);
+              } else {
+              print("Validation Error");
+            }
           },
           child: Text(
             "SignUp", 
@@ -210,7 +251,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     SizedBox(height: 20),    
                     passwordField,
                     SizedBox(height: 20),
-                    confirmPasswordField,
+                    retypePasswordField,
                     SizedBox(height: 20),
                     signupButton,
                     SizedBox(height: 15),

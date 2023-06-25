@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:zoo/camera/main_camera.dart';
 import 'package:zoo/constants.dart';
 import 'package:zoo/model/plants.dart';
+import 'package:zoo/profile/profile_screen.dart';
 import 'package:zoo/ui/scan_page.dart';
-import 'package:zoo/ui/screens/cart_page.dart';
+import 'package:zoo/ui/screens/streamlit.dart';
 import 'package:zoo/ui/screens/favorite_page.dart';
 import 'package:zoo/ui/screens/home_page.dart';
 import 'package:zoo/ui/screens/profile_page.dart';
@@ -28,8 +29,8 @@ class _RootPageState extends State<RootPage> {
     return [
       const HomePage(),
       FavoritePage(favoritedPlants: favorites,),
-      CartPage(addedToCartPlants: myCart,),
-      const ProfilePage(),
+      const WebviewPage(),
+      const ProfileScreen(),
     ];
   }
 
