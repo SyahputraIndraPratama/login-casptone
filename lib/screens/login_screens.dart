@@ -31,7 +31,7 @@ class  _LoginScreenState extends State <LoginScreen> {
     final String password = passwordController.text;
 
     final response = await http.post(
-      Uri.parse('http://192.168.0.109:5000/api/user/login'),
+      Uri.parse('http://192.168.183.50:5000/api/user/login'),
       body: jsonEncode({'email': email, 'password': password}),
       headers: {'Content-Type': 'application/json'},
     );
@@ -128,7 +128,7 @@ class  _LoginScreenState extends State <LoginScreen> {
           padding: EdgeInsets.fromLTRB(20, 15, 20, 15),
           minWidth: MediaQuery.of(context).size.width,
           onPressed: () {
-           _login();
+           Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => RootPage()));
           },
           child: Text(
             "Login", 

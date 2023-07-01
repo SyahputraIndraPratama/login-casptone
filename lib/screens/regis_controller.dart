@@ -7,7 +7,7 @@ import 'package:zoo/screens/login_screens.dart';
 class HttpService{
   static final _client = http.Client();
 
-  static final _registerUrl = Uri.parse('http://192.168.0.109:5000/api/user/signup');
+  static final _registerUrl = Uri.parse('http://192.168.183.50:5000/api/user/signup');
 
   static flutter_register(emailEditingController, passwordEditingController, firstNameEditingController, lastNameEditingController,  retypePasswordEditingController, context) async {
     http.Response response = await _client.post(_registerUrl, body: {
